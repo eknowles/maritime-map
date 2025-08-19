@@ -6,7 +6,7 @@ TILE_URL=${1:-"https://t1.openseamap.org/seamark/{z}/{x}/{y}.png"}
 OUTPUT_FILE=${2:-"output/tiles/region_maritime.pmtiles"}
 MIN_ZOOM=${3:-"0"}
 MAX_ZOOM=${4:-"14"}
-BBOX=${5:-"-9.5,36.9,-6.2,42.2"}
+BBOX=${5:-"37.692,-9.831,38.982,-8.433"}
 CONCURRENCY=${6:-"20"}
 
 mkdir -p $(dirname "$OUTPUT_FILE")
