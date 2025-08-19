@@ -1,61 +1,33 @@
 # Maritime Map
 
-Offline maritime-focused maps using PMTiles with data derived from OSM.
+Generate offline maritime vector tiles from OpenStreetMap data using PMTiles format.
+
+## Features
+
+- **Vector Tiles**: Build maritime-focused vector tiles with tilemaker
+- **Raster Tiles**: Download raster tiles from OpenSeaMap using tilepack
+- **Offline Maps**: Single-file PMTiles archives for offline use
+- **Global Coastlines**: Built-in coastline handling and clipping
+- **Maritime Focus**: Seamarks, ports, marinas, and maritime infrastructure
+
+## Installation
+
+The project requires:
+- `tilemaker` for building vector tiles
+- `tilepack` for downloading raster tiles (via Homebrew: `brew tap eknowles/tools && brew install tilepack`)
+- `pmtiles` for serving tiles (via Homebrew: `brew install pmtiles`)
 
 ## Quick Start
 
-### Using just (Recommended)
 ```bash
-# Install just if not already installed
-brew install just
+# Setup the project
+./setup.sh
 
-# Build tiles for a region
-just build monaco
+# Build maritime tiles for a region
+./build_maritime_map.sh monaco
 
-# Development workflow (build, validate, serve)
-just dev monaco
-
-# See all available commands
-just --list
-```
-
-### Using scripts directly
-```bash
-# Build tiles for a region
-./build_maritime_map.sh region_name
-
-# Serve tiles locally (multiple options)
-./scripts/serve_tiles.sh                    # Uses go-pmtiles (recommended)
-./scripts/serve_tileserver_gl.sh            # Uses tileserver-gl
-python3 scripts/serve_pmtiles.py            # Uses Python PMTiles server
-
-# Install go-pmtiles binary
-./scripts/install_pmtiles.sh
-```
-
-## Project Structure
-
-```
-maritime-map/
-├── config/
-│   ├── config.json              # Tilemaker configuration
-│   ├── process.lua              # Data processing script
-│   ├── maplibre-style.js        # JavaScript style generator
-│   ├── maplibre-style.json      # Static MapLibre style
-│   └── example-usage.html       # Map example
-├── scripts/
-│   ├── download_data.sh         # Download OSM data
-│   ├── build_tiles.sh           # Build vector tiles
-│   ├── build_tilepack.sh        # Build raster tiles
-│   ├── validate_tiles.sh        # Validate tiles
-│   └── serve_tiles.sh           # Serve tiles locally
-├── data/
-│   ├── cache/                   # Cached downloads
-│   ├── osm/                     # OSM PBF files
-│   └── coastline/               # Coastline data
-├── output/
-│   └── tiles/                   # Generated PMTiles
-└── README.md
+# Serve tiles locally
+./scripts/serve_tiles.sh
 ```
 
 ## Usage
@@ -105,71 +77,65 @@ Test land vs water distinction:
 just test-land-water monaco
 ```
 
-### Build Raster Tiles
-
+Test city filtering:
 ```bash
-# Download seamark tiles
-./scripts/build_tilepack.sh \
-  "https://t1.openseamap.org/seamark/{z}/{x}/{y}.png" \
-  "output/tiles/seamark_raster.pmtiles" \
-  "0" "14" "bbox_coordinates" "20"
+just test-cities monaco
 ```
 
-### MapLibre Integration
+## Development
 
-```javascript
-// Initialize PMTiles protocol
-const protocol = new pmtiles.Protocol();
-maplibregl.addProtocol("pmtiles", protocol.tile);
+### Testing with Act
 
-// Create map
-const map = new maplibregl.Map({
-    container: 'map',
-    style: generateMaritimeStyle(),
-    center: [0, 0],
-    zoom: 6
-});
+Test GitHub Actions locally:
+
+```bash
+# Test complete workflow
+./test_with_act.sh monaco
+
+# Test build jobs only
+./test_build_only.sh monaco
 ```
 
-## Prerequisites
+### Testing Tools
 
-- tilemaker v3.0.0
-- tilepack
-- pmtiles
-- Docker (for serving tiles)
-
-## Testing GitHub Action Locally
-
-### Using act (Recommended)
 ```bash
-# Install act if not already installed
-brew install act
+# Test Homebrew installation
+just test-homebrew
 
-# Test the complete GitHub Action workflow locally
-./test_with_act.sh monaco "7.4,43.7,7.5,43.8"
+# Test tilepack installation
+just test-tilepack
 
-# Test only the build jobs (faster, no deployment)
-./test_build_only.sh monaco "7.4,43.7,7.5,43.8"
-
-# Or run act directly
-act workflow_dispatch \
-  -W .github/workflows/build-and-deploy.yml \
-  --input osm_region="monaco" \
-  --input bbox="7.4,43.7,7.5,43.8" \
-  --input build_vector="true" \
-  --input build_raster="true" \
-  --container-architecture linux/amd64 \
-  --verbose
+# Test architecture detection
+just test-architecture
 ```
 
-### Manual Testing
+## Commands
+
+Use `just` for common tasks:
+
 ```bash
-# Test individual components
-./scripts/download_data.sh monaco
-./scripts/build_tiles.sh data/osm/monaco-latest.osm.pbf output/tiles/monaco_maritime.pmtiles
-./scripts/serve_tiles.sh output/tiles/monaco_maritime.pmtiles
+# Build maritime tiles
+just build monaco
+
+# Download data
+just download monaco
+
+# Build tiles
+just tiles
+
+# Build raster tiles
+just raster
+
+# Validate tiles
+just validate
+
+# Serve tiles
+just serve
+
+# Clean up
+just clean
 ```
 
 ## License
 
-Open source. Respect tile server terms of service.
+MIT License

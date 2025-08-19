@@ -24,6 +24,10 @@ echo "Press Ctrl+C to stop"
 if command -v pmtiles &> /dev/null; then
     echo "Using local pmtiles binary..."
     pmtiles serve "$TILES_FILE" --port "$PORT"
+elif command -v brew &> /dev/null; then
+    echo "Installing pmtiles via Homebrew..."
+    brew install pmtiles
+    pmtiles serve "$TILES_FILE" --port "$PORT"
 elif command -v docker &> /dev/null; then
     echo "Using go-pmtiles via Docker..."
     # Download and use go-pmtiles binary

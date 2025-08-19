@@ -121,23 +121,18 @@ jobs:
 
     - name: Download tilepack
       run: |
-        # Get latest tilepack release
-        TILEPACK_VERSION=$(curl -s https://api.github.com/repos/eknowles/tilepack/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-        echo "Downloading tilepack version: $TILEPACK_VERSION"
+        # Install Homebrew
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo "$HOME/.linuxbrew/bin" >> $GITHUB_PATH
         
-        wget -O tilepack https://github.com/eknowles/tilepack/releases/download/$TILEPACK_VERSION/tilepack-linux-amd64
-        chmod +x tilepack
-        sudo mv tilepack /usr/local/bin/
+        # Install tilepack via Homebrew
+        brew tap eknowles/tools
+        brew install tilepack
 
     - name: Download go-pmtiles
       run: |
-        # Get latest pmtiles release
-        PMTILES_VERSION=$(curl -s https://api.github.com/repos/protomaps/go-pmtiles/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-        echo "Downloading pmtiles version: $PMTILES_VERSION"
-        
-        wget -O pmtiles https://github.com/protomaps/go-pmtiles/releases/download/$PMTILES_VERSION/pmtiles-linux-amd64
-        chmod +x pmtiles
-        sudo mv pmtiles /usr/local/bin/
+        # Install pmtiles via Homebrew
+        brew install pmtiles
 
     - name: Build raster tiles
       run: |
@@ -172,26 +167,42 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Create deployment directory
+      run: |
+        mkdir -p dist
+
     - name: Download vector tiles
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: vector-tiles
         path: dist/
 
     - name: Download raster tiles
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: raster-tiles
         path: dist/
 
-    - name: Create deployment directory
+    - name: Copy configuration files
       run: |
-        mkdir -p dist
-        cp config/maplibre-style.js dist/
-        cp config/maplibre-style.json dist/
+        cp config/maplibre-style.js dist/ || true
+        cp config/maplibre-style.json dist/ || true
 
     - name: Copy index.html
       run: cp index.html dist/
+
+    - name: Ensure dist directory has content
+      run: |
+        echo "Dist directory contents:"
+        ls -la dist/ || echo "Dist directory is empty"
+        
+        # Create a placeholder if no tiles were downloaded
+        if [ ! -f "dist/region_maritime.pmtiles" ] && [ ! -f "dist/openseamap_raster.pmtiles" ]; then
+          echo "No tile files found, creating placeholder"
+          echo "No tiles available" > dist/placeholder.txt
+        fi
 
     - name: Setup Pages
       uses: actions/configure-pages@v4

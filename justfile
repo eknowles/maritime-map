@@ -117,6 +117,27 @@ test-cities region="monaco":
     echo "Testing city filtering..."
     ./test_cities.sh {{region}}
 
+# Test tilepack installation
+[group('test')]
+test-tilepack:
+    #!/usr/bin/env bash
+    echo "Testing tilepack installation..."
+    ./test_tilepack.sh
+
+# Test architecture detection
+[group('test')]
+test-architecture:
+    #!/usr/bin/env bash
+    echo "Testing architecture detection..."
+    ./test_architecture.sh
+
+# Test Homebrew installation
+[group('test')]
+test-homebrew:
+    #!/usr/bin/env bash
+    echo "Testing Homebrew installation..."
+    ./test_homebrew.sh
+
 # Clean up generated files
 [group('clean')]
 clean:
