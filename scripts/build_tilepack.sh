@@ -98,7 +98,7 @@ tilepack \
     --output "$TEMP_MBTILES" \
     --minzoom "$MIN_ZOOM" \
     --maxzoom "$MAX_ZOOM" \
-    --bbox="$BBOX" \
+    --bbox="'${BBOX}'" \
     --concurrency "$CONCURRENCY"
 
 BUILD_EXIT_CODE=$?

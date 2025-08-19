@@ -2,7 +2,7 @@
 
 set -e
 
-TILES_FILE=${1:-"output/tiles/region_maritime.pmtiles"}
+TILES_FILE=${1:-"output/tiles/portugal_maritime.pmtiles"}
 LOG_FILE="output/logs/validation.log"
 REPORT_FILE="output/reports/validation_report.txt"
 
