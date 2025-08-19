@@ -71,9 +71,10 @@ jobs:
           data/cache
           data/osm
           data/coastline
-        key: ${{ runner.os }}-data-${{ hashFiles('scripts/download_data.sh') }}
+        key: ${{ runner.os }}-osm-data-${{ env.OSM_REGION }}-${{ hashFiles('scripts/download_data.sh') }}
         restore-keys: |
-          ${{ runner.os }}-data-
+          ${{ runner.os }}-osm-data-${{ env.OSM_REGION }}-
+          ${{ runner.os }}-osm-data-
 
     - name: Download tilemaker
       run: |
