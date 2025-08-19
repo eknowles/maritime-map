@@ -68,7 +68,7 @@ if ! command -v tilepack &> /dev/null; then
         cd "$TEMP_DIR"
         
         # Download and extract
-        curl -L -o tilepack.tar.gz "$DOWNLOAD_URL"
+        curl -s -L -o tilepack.tar.gz "$DOWNLOAD_URL"
         tar -xzf tilepack.tar.gz
         
         # Install to /usr/local/bin if possible, otherwise to current directory
