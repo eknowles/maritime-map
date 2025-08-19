@@ -102,7 +102,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: vector-tiles
-        path: output/tiles/region_maritime.pmtiles
+        path: output/tiles/portugal_maritime.pmtiles
         retention-days: 1
 
   build-raster-tiles:
@@ -199,7 +199,7 @@ jobs:
         ls -la dist/ || echo "Dist directory is empty"
         
         # Create a placeholder if no tiles were downloaded
-        if [ ! -f "dist/region_maritime.pmtiles" ] && [ ! -f "dist/openseamap_raster.pmtiles" ]; then
+        if [ ! -f "dist/portugal_maritime.pmtiles" ] && [ ! -f "dist/openseamap_raster.pmtiles" ]; then
           echo "No tile files found, creating placeholder"
           echo "No tiles available" > dist/placeholder.txt
         fi

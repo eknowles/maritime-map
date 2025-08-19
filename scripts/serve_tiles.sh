@@ -39,7 +39,7 @@ elif command -v docker &> /dev/null; then
         sh -c "
             apk add --no-cache wget curl unzip &&
             LATEST_VERSION=\$(curl -s https://api.github.com/repos/protomaps/go-pmtiles/releases/latest | grep '\"tag_name\"' | cut -d'\"' -f4 | sed 's/v//') &&
-            wget -O pmtiles.tar.gz https://github.com/protomaps/go-pmtiles/releases/download/v\${LATEST_VERSION}/go-pmtiles_\${LATEST_VERSION}_Linux_x86_64.tar.gz &&
+            wget -q --show-progress -O pmtiles.tar.gz https://github.com/protomaps/go-pmtiles/releases/download/v\${LATEST_VERSION}/go-pmtiles_\${LATEST_VERSION}_Linux_x86_64.tar.gz &&
             tar -xzf pmtiles.tar.gz &&
             chmod +x pmtiles &&
             ./pmtiles serve /data/$(basename "$TILES_FILE") --port 8080

@@ -2,8 +2,8 @@
 
 set -e
 
-INPUT_FILE=${1:-"data/osm/region-latest.osm.pbf"}
-OUTPUT_FILE=${2:-"output/tiles/region_maritime.pmtiles"}
+INPUT_FILE=${1:-"data/osm/portugal-latest.osm.pbf"}
+OUTPUT_FILE=${2:-"output/tiles/portugal_maritime.pmtiles"}
 CONFIG_FILE=${3:-"config/config.json"}
 PROCESS_FILE=${4:-"config/process.lua"}
 TEMP_DIR=${5:-"./temp"}
@@ -37,7 +37,6 @@ tilemaker \
     --output "$OUTPUT_FILE" \
     --config "$CONFIG_FILE" \
     --process "$PROCESS_FILE" \
-    --verbose \
     --store "$TEMP_DIR" \
     --threads $CPU_CORES
 

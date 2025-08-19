@@ -16,7 +16,7 @@ OSM_CACHE="${CACHE_DIR}/${REGION}-latest.osm.pbf"
 if [ -f "$OSM_CACHE" ]; then
     cp "$OSM_CACHE" "$OSM_FILE"
 else
-    wget -O "$OSM_FILE" \
+    wget -q --show-progress -O "$OSM_FILE" \
         "https://download.geofabrik.de/europe/${REGION}-latest.osm.pbf"
     
     if [ $? -eq 0 ]; then
@@ -33,7 +33,7 @@ WATER_POLYGONS_FILE="${COASTLINE_DIR}/water_polygons.shp.zip"
 if [ -f "$WATER_POLYGONS_CACHE" ]; then
     cp "$WATER_POLYGONS_CACHE" "$WATER_POLYGONS_FILE"
 else
-    wget -O "$WATER_POLYGONS_FILE" \
+    wget -q --show-progress -O "$WATER_POLYGONS_FILE" \
         "https://osmdata.openstreetmap.de/download/water-polygons-split-4326.zip"
     
     if [ $? -eq 0 ]; then
@@ -44,7 +44,7 @@ else
     fi
 fi
 
-unzip -o "$WATER_POLYGONS_FILE" -d "${COASTLINE_DIR}/"
+unzip -q -o "$WATER_POLYGONS_FILE" -d "${COASTLINE_DIR}/"
 
 LAND_POLYGONS_CACHE="${CACHE_DIR}/land-polygons-complete-4326.zip"
 LAND_POLYGONS_FILE="${COASTLINE_DIR}/land-polygons-complete-4326.zip"
@@ -52,7 +52,7 @@ LAND_POLYGONS_FILE="${COASTLINE_DIR}/land-polygons-complete-4326.zip"
 if [ -f "$LAND_POLYGONS_CACHE" ]; then
     cp "$LAND_POLYGONS_CACHE" "$LAND_POLYGONS_FILE"
 else
-    wget -O "$LAND_POLYGONS_FILE" \
+    wget -q --show-progress -O "$LAND_POLYGONS_FILE" \
         "https://osmdata.openstreetmap.de/download/land-polygons-complete-4326.zip" || true
     
     if [ $? -eq 0 ]; then
