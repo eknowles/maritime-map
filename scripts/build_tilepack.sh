@@ -6,7 +6,7 @@ TILE_URL=${1:-"https://t1.openseamap.org/seamark/{z}/{x}/{y}.png"}
 OUTPUT_FILE=${2:-"output/tiles/region_maritime.pmtiles"}
 MIN_ZOOM=${3:-"0"}
 MAX_ZOOM=${4:-"14"}
-BBOX=${5:-"37.692,-9.831,38.982,-8.433"}
+BBOX=${5:-"-9.831,37.692,-8.433,38.982"}
 CONCURRENCY=${6:-"20"}
 
 mkdir -p $(dirname "$OUTPUT_FILE")
@@ -98,7 +98,7 @@ tilepack \
     --output "$TEMP_MBTILES" \
     --minzoom "$MIN_ZOOM" \
     --maxzoom "$MAX_ZOOM" \
-    --bbox="'${BBOX}'" \
+    --bbox="$BBOX" \
     --concurrency "$CONCURRENCY"
 
 BUILD_EXIT_CODE=$?

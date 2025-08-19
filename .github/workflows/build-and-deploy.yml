@@ -15,7 +15,7 @@ on:
       bbox:
         description: 'Bounding box (minLon,minLat,maxLon,maxLat)'
         required: false
-        default: '37.692,-9.831,38.982,-8.433'
+        default: '-9.831,37.692,-8.433,38.982'
         type: string
       tile_url:
         description: 'Tile server URL for tilepack'
@@ -116,7 +116,7 @@ jobs:
 
     - name: Setup environment
       run: |
-        echo "BBOX=${{ github.event.inputs.bbox || '37.692,-9.831,38.982,-8.433' }}" >> $GITHUB_ENV
+        echo "BBOX=${{ github.event.inputs.bbox || '-9.831,37.692,-8.433,38.982' }}" >> $GITHUB_ENV
         echo "TILE_URL=${{ github.event.inputs.tile_url || 'https://t1.openseamap.org/seamark/{z}/{x}/{y}.png' }}" >> $GITHUB_ENV
         echo "MIN_ZOOM=${{ github.event.inputs.min_zoom || '0' }}" >> $GITHUB_ENV
         echo "MAX_ZOOM=${{ github.event.inputs.max_zoom || '14' }}" >> $GITHUB_ENV
