@@ -119,20 +119,18 @@ jobs:
         echo "MIN_ZOOM=${{ github.event.inputs.min_zoom || '0' }}" >> $GITHUB_ENV
         echo "MAX_ZOOM=${{ github.event.inputs.max_zoom || '14' }}" >> $GITHUB_ENV
 
-    - name: Download tilepack
+    - name: Setup Homebrew
       run: |
-        # Install Homebrew
+        # Install Homebrew with better error handling
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         echo "$HOME/.linuxbrew/bin" >> $GITHUB_PATH
-        
-        # Install tilepack via Homebrew
-        brew tap eknowles/tools
-        brew install tilepack
+        echo "$HOME/.linuxbrew/sbin" >> $GITHUB_PATH
+        brew --version
 
-    - name: Download go-pmtiles
+    - name: Install tilepack and pmtiles
       run: |
-        # Install pmtiles via Homebrew
-        brew install pmtiles
+        brew tap eknowles/tools
+        brew install tilepack pmtiles
 
     - name: Build raster tiles
       run: |
