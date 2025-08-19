@@ -1,0 +1,206 @@
+name: Build Maritime Tiles and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      osm_region:
+        description: 'OSM region (e.g., region, spain)'
+        required: false
+        default: 'region'
+        type: string
+      bbox:
+        description: 'Bounding box (minLon,minLat,maxLon,maxLat)'
+        required: false
+        default: '-9.5,36.9,-6.2,42.2'
+        type: string
+      tile_url:
+        description: 'Tile server URL for tilepack'
+        required: false
+        default: 'https://t1.openseamap.org/seamark/{z}/{x}/{y}.png'
+        type: string
+      min_zoom:
+        description: 'Minimum zoom level'
+        required: false
+        default: '0'
+        type: string
+      max_zoom:
+        description: 'Maximum zoom level'
+        required: false
+        default: '14'
+        type: string
+      build_vector:
+        description: 'Build vector tiles with tilemaker'
+        required: false
+        default: true
+        type: boolean
+      build_raster:
+        description: 'Build raster tiles with tilepack'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-vector-tiles:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.build_vector != 'false' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup environment
+      run: |
+        echo "OSM_REGION=${{ github.event.inputs.osm_region || 'region' }}" >> $GITHUB_ENV
+
+    - name: Cache data directory
+      uses: actions/cache@v4
+      with:
+        path: |
+          data/cache
+          data/osm
+          data/coastline
+        key: ${{ runner.os }}-data-${{ hashFiles('scripts/download_data.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-data-
+
+    - name: Download tilemaker
+      run: |
+        wget -O tilemaker.zip https://github.com/systemed/tilemaker/releases/download/v3.0.0/tilemaker-ubuntu-22.04.zip
+        unzip tilemaker.zip
+        sudo mv build/tilemaker /usr/local/bin/
+        rm -rf build tilemaker.zip
+
+    - name: Download OSM data
+      run: |
+        mkdir -p data/osm data/coastline data/cache
+        chmod +x scripts/download_data.sh
+        ./scripts/download_data.sh ${{ env.OSM_REGION }}
+
+    - name: Build vector tiles
+      run: |
+        chmod +x scripts/build_tiles.sh
+        ./scripts/build_tiles.sh
+
+    - name: Validate vector tiles
+      run: |
+        chmod +x scripts/validate_tiles.sh
+        ./scripts/validate_tiles.sh
+
+    - name: Upload vector tiles artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vector-tiles
+        path: output/tiles/region_maritime.pmtiles
+        retention-days: 1
+
+  build-raster-tiles:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.build_raster != 'false' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup environment
+      run: |
+        echo "BBOX=${{ github.event.inputs.bbox || '-9.5,36.9,-6.2,42.2' }}" >> $GITHUB_ENV
+        echo "TILE_URL=${{ github.event.inputs.tile_url || 'https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png' }}" >> $GITHUB_ENV
+        echo "MIN_ZOOM=${{ github.event.inputs.min_zoom || '0' }}" >> $GITHUB_ENV
+        echo "MAX_ZOOM=${{ github.event.inputs.max_zoom || '14' }}" >> $GITHUB_ENV
+
+    - name: Download tilepack
+      run: |
+        # Get latest tilepack release
+        TILEPACK_VERSION=$(curl -s https://api.github.com/repos/eknowles/tilepack/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+        echo "Downloading tilepack version: $TILEPACK_VERSION"
+        
+        wget -O tilepack https://github.com/eknowles/tilepack/releases/download/$TILEPACK_VERSION/tilepack-linux-amd64
+        chmod +x tilepack
+        sudo mv tilepack /usr/local/bin/
+
+    - name: Download go-pmtiles
+      run: |
+        # Get latest pmtiles release
+        PMTILES_VERSION=$(curl -s https://api.github.com/repos/protomaps/go-pmtiles/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+        echo "Downloading pmtiles version: $PMTILES_VERSION"
+        
+        wget -O pmtiles https://github.com/protomaps/go-pmtiles/releases/download/$PMTILES_VERSION/pmtiles-linux-amd64
+        chmod +x pmtiles
+        sudo mv pmtiles /usr/local/bin/
+
+    - name: Build raster tiles
+      run: |
+        mkdir -p output/tiles
+        chmod +x scripts/build_tilepack.sh
+        
+        # Build raster tiles from OpenSeaMap
+        ./scripts/build_tilepack.sh \
+          "${{ env.TILE_URL }}" \
+          "output/tiles/openseamap_raster.pmtiles" \
+          "${{ env.MIN_ZOOM }}" \
+          "${{ env.MAX_ZOOM }}" \
+          "${{ env.BBOX }}" \
+          "20"
+
+    - name: Upload raster tiles artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: raster-tiles
+        path: output/tiles/openseamap_raster.pmtiles
+        retention-days: 1
+
+  deploy:
+    needs: [build-vector-tiles, build-raster-tiles]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Download vector tiles
+      uses: actions/download-artifact@v4
+      with:
+        name: vector-tiles
+        path: dist/
+
+    - name: Download raster tiles
+      uses: actions/download-artifact@v4
+      with:
+        name: raster-tiles
+        path: dist/
+
+    - name: Create deployment directory
+      run: |
+        mkdir -p dist
+        cp config/maplibre-style.js dist/
+        cp config/maplibre-style.json dist/
+
+    - name: Copy index.html
+      run: cp index.html dist/
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

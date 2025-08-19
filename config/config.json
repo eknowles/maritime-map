@@ -1,0 +1,116 @@
+{
+  "layers": {
+    "water": {
+      "minzoom": 10,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0,
+      "properties": {
+        "include_ids": false,
+        "compress": "gzip"
+      }
+    },
+    "coastline": {
+      "minzoom": 0,
+      "maxzoom": 14,
+      "simplify_below": 10,
+      "simplify_level": 0.0002,
+      "simplify_ratio": 2.5
+    },
+    "rivers": {
+      "minzoom": 10,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "landuse": {
+      "minzoom": 0,
+      "maxzoom": 14,
+      "simplify_below": 10,
+      "simplify_level": 0.0002,
+      "simplify_ratio": 2.5
+    },
+    "airports": {
+      "minzoom": 8,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "ferry_routes": {
+      "minzoom": 8,
+      "maxzoom": 14,
+      "simplify_below": 10,
+      "simplify_level": 0.0002,
+      "simplify_ratio": 2.5
+    },
+    "seamarks": {
+      "minzoom": 8,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "ports": {
+      "minzoom": 8,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "marinas": {
+      "minzoom": 10,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "cities": {
+      "minzoom": 7,
+      "maxzoom": 14,
+      "simplify_below": 10,
+      "simplify_level": 0.0002,
+      "simplify_ratio": 2.5
+    },
+    "military": {
+      "minzoom": 6,
+      "maxzoom": 14,
+      "simplify_below": 10,
+      "simplify_level": 0.0002,
+      "simplify_ratio": 2.5
+    },
+    "cables": {
+      "minzoom": 7,
+      "maxzoom": 14,
+      "simplify_below": 12,
+      "simplify_level": 0.0001,
+      "simplify_ratio": 2.0
+    },
+    "territorial_waters": {
+      "minzoom": 4,
+      "maxzoom": 14,
+      "simplify_below": 8,
+      "simplify_level": 0.0005,
+      "simplify_ratio": 3.0
+    }
+  },
+  "settings": {
+    "maxzoom": 14,
+    "basezoom": 14,
+    "include_ids": false,
+    "compress": "gzip",
+    "name": "maritime_map",
+    "version": "1.0.0",
+    "description": "Maritime-focused vector tiles with specific landuse, rivers, and enhanced seamarks",
+    "bounds": [-180, -85, 180, 85],
+    "center": [-7.85, 39.55, 6],
+    "coastlines": {
+      "source": "data/coastline/water_polygons.shp",
+      "simplify": 0.0001,
+      "max_zoom": 10
+    }
+  }
+}
+

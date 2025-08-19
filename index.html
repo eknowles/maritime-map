@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Map</title>
+    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
+    <script src='https://unpkg.com/pmtiles@3.1.0/dist/index.js'></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        function generateMaritimeStyle(config = {}) {
+            const defaults = {
+                waterColor: '#1e3a8a',
+                coastlineColor: '#1e40af',
+                portColor: '#dc2626',
+                marinaColor: '#ea580c',
+                seamarkColor: '#059669',
+                buoyColor: '#7c3aed',
+                ferryColor: '#0891b2',
+                cableColor: '#be185d',
+                territorialColor: '#f59e0b',
+                cityColor: '#374151',
+                airportColor: '#6b7280',
+                militaryColor: '#dc2626',
+                landColor: '#fef3c7'
+            };
+
+            const colors = { ...defaults, ...config.colors };
+
+            return {
+                version: 8,
+                name: "Maritime Map",
+                sources: {
+                    "maritime-tiles": {
+                        type: "vector",
+                        url: "./region_maritime.pmtiles"
+                    }
+                },
+                layers: [
+                    {
+                        id: "water",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "water",
+                        minzoom: 10,
+                        maxzoom: 14,
+                        paint: {
+                            "fill-color": colors.waterColor,
+                            "fill-opacity": 0.8
+                        },
+                        filter: ["==", ["geometry-type"], "Polygon"]
+                    },
+                    {
+                        id: "landuse",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "landuse",
+                        minzoom: 0,
+                        maxzoom: 14,
+                        paint: {
+                            "fill-color": [
+                                "case",
+                                ["==", ["get", "type"], "land"], colors.landColor,
+                                ["==", ["get", "type"], "beach"], "#fbbf24",
+                                ["==", ["get", "type"], "water"], colors.waterColor,
+                                colors.landColor
+                            ],
+                            "fill-opacity": 0.8
+                        }
+                    },
+                    {
+                        id: "coastline",
+                        type: "line",
+                        source: "maritime-tiles",
+                        "source-layer": "coastline",
+                        minzoom: 0,
+                        maxzoom: 14,
+                        paint: {
+                            "line-color": colors.coastlineColor,
+                            "line-width": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0, 1,
+                                14, 3
+                            ]
+                        }
+                    },
+                    {
+                        id: "ports",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "ports",
+                        paint: {
+                            "fill-color": colors.portColor,
+                            "fill-opacity": 0.7
+                        }
+                    },
+                    {
+                        id: "marinas",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "marinas",
+                        paint: {
+                            "fill-color": colors.marinaColor,
+                            "fill-opacity": 0.7
+                        }
+                    },
+                    {
+                        id: "seamarks",
+                        type: "circle",
+                        source: "maritime-tiles",
+                        "source-layer": "seamarks",
+                        paint: {
+                            "circle-color": colors.seamarkColor,
+                            "circle-radius": 4
+                        }
+                    },
+                    {
+                        id: "buoys",
+                        type: "circle",
+                        source: "maritime-tiles",
+                        "source-layer": "buoys",
+                        paint: {
+                            "circle-color": colors.buoyColor,
+                            "circle-radius": 3
+                        }
+                    },
+                    {
+                        id: "ferry-routes",
+                        type: "line",
+                        source: "maritime-tiles",
+                        "source-layer": "ferry_routes",
+                        paint: {
+                            "line-color": colors.ferryColor,
+                            "line-width": 3,
+                            "line-dasharray": [2, 2]
+                        }
+                    },
+                    {
+                        id: "cables",
+                        type: "line",
+                        source: "maritime-tiles",
+                        "source-layer": "cables",
+                        minzoom: 7,
+                        maxzoom: 14,
+                        paint: {
+                            "line-color": colors.cableColor,
+                            "line-width": 1,
+                            "line-dasharray": [1, 1]
+                        }
+                    },
+                    {
+                        id: "territorial-waters",
+                        type: "line",
+                        source: "maritime-tiles",
+                        "source-layer": "territorial_waters",
+                        paint: {
+                            "line-color": colors.territorialColor,
+                            "line-width": 2,
+                            "line-dasharray": [5, 5]
+                        }
+                    },
+                    {
+                        id: "cities",
+                        type: "symbol",
+                        source: "maritime-tiles",
+                        "source-layer": "cities",
+                        minzoom: 7,
+                        maxzoom: 14,
+                        layout: {
+                            "text-field": ["get", "name"],
+                            "text-size": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                7, 10,
+                                14, 16
+                            ],
+                            "text-offset": [0, 1]
+                        },
+                        paint: {
+                            "text-color": colors.cityColor
+                        }
+                    },
+                    {
+                        id: "airports",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "airports",
+                        paint: {
+                            "fill-color": colors.airportColor,
+                            "fill-opacity": 0.5
+                        }
+                    },
+                    {
+                        id: "military",
+                        type: "fill",
+                        source: "maritime-tiles",
+                        "source-layer": "military",
+                        paint: {
+                            "fill-color": colors.militaryColor,
+                            "fill-opacity": 0.3
+                        }
+                    }
+                ]
+            };
+        }
+
+        const protocol = new pmtiles.Protocol();
+        maplibregl.addProtocol("pmtiles", protocol.tile);
+
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: generateMaritimeStyle(),
+            center: [0, 0],
+            zoom: 6
+        });
+    </script>
+</body>
+</html>

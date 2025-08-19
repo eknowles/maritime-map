@@ -1,0 +1,7 @@
+*.pbf
+*.pmtiles
+*.zip
+.idea
+output/
+data/
+./pmtiles

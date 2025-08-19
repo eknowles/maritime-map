@@ -1,0 +1,247 @@
+{
+  "version": 8,
+  "name": "Maritime Map",
+  "sources": {
+    "maritime-tiles": {
+      "type": "vector",
+      "url": "./maritime.pmtiles"
+    }
+  },
+  "sprite": "",
+  "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#e8f4f8"
+      }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#a8d1e0",
+        "fill-opacity": 0.8
+      }
+    },
+    {
+      "id": "coastline",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "coastline",
+      "paint": {
+        "line-color": "#2c5aa0",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "landuse",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "landuse",
+      "paint": {
+        "fill-color": [
+          "case",
+          ["==", ["get", "landuse"], "beach"], "#f4e4c1",
+          ["==", ["get", "landuse"], "earth"], "#d2b48c",
+          ["==", ["get", "landuse"], "protected_area"], "#90ee90",
+          ["==", ["get", "natural"], "beach"], "#f4e4c1",
+          ["==", ["get", "natural"], "protected_area"], "#90ee90",
+          "#f5f5f5"
+        ],
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "rivers",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "rivers",
+      "minzoom": 10,
+      "paint": {
+        "line-color": "#4a90e2",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10, 1,
+          14, 3
+        ]
+      }
+    },
+    {
+      "id": "ferry-routes",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "ferry_routes",
+      "paint": {
+        "line-color": "#ff6b35",
+        "line-width": 2,
+        "line-dasharray": [2, 2]
+      }
+    },
+    {
+      "id": "territorial-waters",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "territorial_waters",
+      "paint": {
+        "line-color": "#ff0000",
+        "line-width": 2,
+        "line-dasharray": [5, 5]
+      }
+    },
+    {
+      "id": "military",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "military",
+      "paint": {
+        "fill-color": "#ff6b6b",
+        "fill-opacity": 0.3
+      }
+    },
+    {
+      "id": "airports",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "airports",
+      "paint": {
+        "fill-color": "#8b4513",
+        "fill-opacity": 0.5
+      }
+    },
+    {
+      "id": "airports-outline",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "airports",
+      "paint": {
+        "line-color": "#654321",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "ports",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "ports",
+      "paint": {
+        "fill-color": "#4169e1",
+        "fill-opacity": 0.6
+      }
+    },
+    {
+      "id": "marinas",
+      "type": "fill",
+      "source": "maritime-tiles",
+      "source-layer": "marinas",
+      "paint": {
+        "fill-color": "#32cd32",
+        "fill-opacity": 0.6
+      }
+    },
+    {
+      "id": "cables",
+      "type": "line",
+      "source": "maritime-tiles",
+      "source-layer": "cables",
+      "paint": {
+        "line-color": "#ff1493",
+        "line-width": 1,
+        "line-dasharray": [1, 1]
+      }
+    },
+    {
+      "id": "seamarks",
+      "type": "circle",
+      "source": "maritime-tiles",
+      "source-layer": "seamarks",
+      "paint": {
+        "circle-radius": 3,
+        "circle-color": [
+          "case",
+          ["==", ["get", "seamark_type"], "buoy"], "#ffff00",
+          ["==", ["get", "seamark_type"], "beacon"], "#ffa500",
+          ["==", ["get", "seamark_type"], "light"], "#ffff00",
+          "#ff0000"
+        ],
+        "circle-stroke-color": "#000000",
+        "circle-stroke-width": 1
+      }
+    },
+    {
+      "id": "cities",
+      "type": "symbol",
+      "source": "maritime-tiles",
+      "source-layer": "cities",
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Regular"],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4, 10,
+          14, 16
+        ]
+      },
+      "paint": {
+        "text-color": "#000000",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "airport-labels",
+      "type": "symbol",
+      "source": "maritime-tiles",
+      "source-layer": "airports",
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Regular"],
+        "text-size": 12
+      },
+      "paint": {
+        "text-color": "#654321",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "port-labels",
+      "type": "symbol",
+      "source": "maritime-tiles",
+      "source-layer": "ports",
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Regular"],
+        "text-size": 11
+      },
+      "paint": {
+        "text-color": "#4169e1",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "marina-labels",
+      "type": "symbol",
+      "source": "maritime-tiles",
+      "source-layer": "marinas",
+      "layout": {
+        "text-field": ["get", "name"],
+        "text-font": ["Open Sans Regular"],
+        "text-size": 10
+      },
+      "paint": {
+        "text-color": "#32cd32",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 1
+      }
+    }
+  ]
+}

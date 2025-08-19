@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  data-downloader:
+    image: alpine:latest
+    volumes:
+      - ./data:/data
+      - ./scripts:/scripts
+    working_dir: /data
+    command: ["/scripts/download_data.sh", "region"]
+    profiles:
+      - download
+
+  tile-builder:
+    image: ghcr.io/systemed/tilemaker:master
+    volumes:
+      - .:/data
+    working_dir: /data
+    command: >
+      tilemaker
+      /data/data/osm/region-latest.osm.pbf
+      --output /data/output/tiles/region_maritime.pmtiles
+      --config /data/config/config.json
+      --process /data/config/process.lua
+      --verbose
+      --store /data/temp
+      --threads 4
+    profiles:
+      - build
+    depends_on:
+      - data-downloader
+
+  tile-server:
+    image: ghcr.io/systemed/tilemaker:master
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./output:/data
+    command: ["tilemaker-server", "/data/region_maritime.pmtiles"]
+    profiles:
+      - serve
+    restart: unless-stopped
+
+  tile-validator:
+    image: ghcr.io/systemed/tilemaker:master
+    volumes:
+      - .:/data
+    working_dir: /data
+    command: >
+      sh -c "
+        tilemaker-validate /data/output/tiles/region_maritime.pmtiles > /data/output/logs/validation.log 2>&1 &&
+        echo 'Validation completed' &&
+        cat /data/output/logs/validation.log
+      "
+    profiles:
+      - validate
+    depends_on:
+      - tile-builder
+
+  maritime-pipeline:
+    image: ghcr.io/systemed/tilemaker:master
+    volumes:
+      - .:/data
+    working_dir: /data
+    command: >
+      sh -c "
+        /scripts/download_data.sh region &&
+        tilemaker
+          /data/data/osm/region-latest.osm.pbf
+          --output /data/output/tiles/region_maritime.pmtiles
+          --config /data/config/config.json
+          --process /data/config/process.lua
+          --verbose
+          --store /data/temp
+          --threads 4
+      "
+    profiles:
+      - pipeline
+
+volumes:
+  data:
+  output:
+  temp:
+

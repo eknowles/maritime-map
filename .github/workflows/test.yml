@@ -1,0 +1,52 @@
+name: Test Build
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip
+        
+    - name: Download tilemaker v3.0.0
+      run: |
+        wget -O tilemaker.tar.gz https://github.com/systemed/tilemaker/releases/download/v3.0.0/tilemaker-3.0.0-linux-x86_64.tar.gz
+        tar -xzf tilemaker.tar.gz
+        sudo mv tilemaker-3.0.0-linux-x86_64/tilemaker /usr/local/bin/
+        sudo chmod +x /usr/local/bin/tilemaker
+        
+    - name: Verify tilemaker installation
+      run: |
+        tilemaker --version
+        tilemaker --help | head -5
+        
+    - name: Test configuration files
+      run: |
+        echo "Testing config.json syntax..."
+        python3 -m json.tool config/config.json > /dev/null
+        echo "Testing maplibre-style.json syntax..."
+        python3 -m json.tool config/maplibre-style.json > /dev/null
+        echo "Testing process.lua syntax..."
+        lua -c config/process.lua
+        echo "All configuration files are valid!"
+        
+    - name: Test scripts
+      run: |
+        echo "Testing script permissions..."
+        chmod +x scripts/*.sh
+        echo "Testing script syntax..."
+        bash -n scripts/download_data.sh
+        bash -n scripts/build_tiles.sh
+        bash -n scripts/validate_tiles.sh
+        bash -n scripts/serve_tiles.sh
+        echo "All scripts are valid!"
