@@ -2,7 +2,7 @@
 
 set -e
 
-REGION=${1:-"region"}
+REGION=${1:-"portugal"}
 DATA_DIR="./data"
 OSM_DIR="${DATA_DIR}/osm"
 COASTLINE_DIR="${DATA_DIR}/coastline"

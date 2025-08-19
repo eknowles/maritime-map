@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       osm_region:
-        description: 'OSM region (e.g., region, spain)'
+        description: 'OSM region (e.g., portugal, spain)'
         required: false
         default: 'portugal'
         type: string
@@ -62,7 +62,7 @@ jobs:
 
     - name: Setup environment
       run: |
-        echo "OSM_REGION=${{ github.event.inputs.osm_region || 'region' }}" >> $GITHUB_ENV
+        echo "OSM_REGION=${{ github.event.inputs.osm_region || 'portugal' }}" >> $GITHUB_ENV
 
     - name: Cache data directory
       uses: actions/cache@v4
