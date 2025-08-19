@@ -80,6 +80,7 @@ jobs:
         wget -O tilemaker.zip https://github.com/systemed/tilemaker/releases/download/v3.0.0/tilemaker-ubuntu-22.04.zip
         unzip tilemaker.zip
         sudo mv build/tilemaker /usr/local/bin/
+        sudo chmod +x /usr/local/bin/tilemaker
         rm -rf build tilemaker.zip
 
     - name: Download OSM data
@@ -130,10 +131,18 @@ jobs:
         echo "/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
         brew --version
 
-    - name: Install tilepack and pmtiles
+    - name: Install pmtiles
       run: |
-        brew tap eknowles/tools
-        brew install tilepack pmtiles
+        brew install pmtiles
+
+    - name: Download and install tilepack
+      run: |
+        # Download tilepack binary directly
+        wget -q --show-progress -O tilepack.tar.gz https://github.com/eknowles/tilepack/releases/download/v1.4.0/tilepack-1.4.0-linux-x64.tar.gz
+        tar -xzf tilepack.tar.gz
+        sudo mv tilepack /usr/local/bin/
+        sudo chmod +x /usr/local/bin/tilepack
+        rm tilepack.tar.gz
 
     - name: Build raster tiles
       run: |
